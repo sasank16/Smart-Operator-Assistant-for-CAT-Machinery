@@ -107,3 +107,36 @@ export function playCompanionChime() {
     console.error('Audio play error', e)
   }
 }
+
+export function playMachineHornSound() {
+  try {
+    const ctx = getAudioContext()
+    if (!ctx) return
+
+    const now = ctx.currentTime
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    // Dual-tone heavy equipment air horn (310Hz + 380Hz)
+    osc1.type = 'sawtooth'
+    osc2.type = 'triangle'
+
+    osc1.frequency.setValueAtTime(310, now)
+    osc2.frequency.setValueAtTime(380, now)
+
+    gain.gain.setValueAtTime(0.2, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6)
+
+    osc1.connect(gain)
+    osc2.connect(gain)
+    gain.connect(ctx.destination)
+
+    osc1.start(now)
+    osc2.start(now)
+    osc1.stop(now + 0.65)
+    osc2.stop(now + 0.65)
+  } catch (e) {
+    console.error('Audio play error', e)
+  }
+}
